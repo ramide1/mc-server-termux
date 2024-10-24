@@ -4,7 +4,7 @@ pkg upgrade -y &>/dev/null && echo "Updated packages" || echo "Error updating pa
 
 if ! command -v curl &>/dev/null; then
     echo "curl is not installed. Installing curl..."
-    pkg install curl -y &>/dev/null
+    pkg install curl -y &>/dev/null && echo "Installed curl" || echo "Error installing curl"
 fi
 
 if [ ! -d "$HOME/storage/shared" ]; then
@@ -38,7 +38,7 @@ if [ "$java_ver" != 21 ]; then
     exit 1
 fi
 
-read -p "Enter the amount of RAM to allocate (in GB, e.g., 1 for 1GB): " ram
+read -p "Enter the amount of RAM to allocate (in GB, e.g., 1 for 1 GB): " ram
 if ! [[ "$ram" =~ ^[0-9]+$ ]]; then
     echo "Invalid input. Exiting."
     exit 1
@@ -48,9 +48,9 @@ echo "Select server type:"
 echo "1) Paper"
 echo "2) Purpur"
 echo "3) Fabric"
-read -rp "Choose an option [1-3]: " server_choice
+read -rp "Choose an option [1-3]: " server_type
 
-if [ "$server_choice" != "1" ] && [ "$server_choice" != "2" ] && [ "$server_choice" != "3" ]; then
+if [ "$server_type" != "1" ] && [ "$server_type" != "2" ] && [ "$server_type" != "3" ]; then
     echo "Invalid option. Exiting."
     exit 1
 fi
@@ -62,7 +62,7 @@ if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     exit 1
 fi
 
-case "$server_choice" in
+case "$server_type" in
     1)
         echo "Fetching PaperMC build information..."
         paper_api="https://papermc.io/api/v2/projects/paper/versions/$version"
@@ -95,7 +95,7 @@ fi
 
 echo "Download complete."
 
-if [ "$server_choice" = "3" ]; then
+if [ "$server_type" = "3" ]; then
     echo "Installing Fabric server..."
     java -jar "$jar_name" server -mcversion "$version" -downloadMinecraft
     if [ $? -ne 0 ]; then
@@ -117,7 +117,7 @@ echo "java -Xms${ram}G -Xmx${ram}G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:
 } > "$mcserver_path"
 
 chmod +x "$mcserver_path"
-echo "You can now start the server by typing 'mcserver'."
+echo "You can now start the server by typing \"mcserver\""
 
 echo "Starting the Minecraft server with $ram GB of RAM..."
 java -Xms${ram}G -Xmx${ram}G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar "$jar_name" nogui
