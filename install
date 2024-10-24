@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm ~/x
+
 pkg upgrade -y &>/dev/null && echo "Updated packages" || echo "Error updating packages"
 
 if ! command -v curl &>/dev/null; then
