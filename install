@@ -9,7 +9,7 @@ if ! command -v curl &>/dev/null; then
     pkg install curl -y && echo "Installed curl" || echo "Error installing curl"
 fi
 
-if [ ! -d "$HOME/storage/shared" ]; then
+if [ ! -d "$HOME/storage" ]; then
     echo "Requesting storage permissions..."
     termux-setup-storage
     if [ $? -ne 0 ]; then
@@ -19,10 +19,10 @@ if [ ! -d "$HOME/storage/shared" ]; then
     echo "Storage permissions granted."
 fi
 
-read -p "Enter the folder name for your Minecraft server: " folder_name
-server_dir="$HOME/storage/shared/$folder_name"
+read -p "Enter the directory name for your Minecraft server: " directory_name
+server_dir="$HOME/storage/shared/$directory_name"
 mkdir -p "$server_dir"
-cd "$server_dir" || { echo "Failed to access server folder"; exit 1; }
+cd "$server_dir" || { echo "Failed to access server directory"; exit 1; }
 
 java_ver=$(java -version 2>&1 | awk -F[\"\.] -v OFS=. 'NR==1{print $2}')
 
@@ -30,7 +30,10 @@ if [ "$java_ver" = 17 ]; then
     pkg remove openjdk-17 -y && echo "Removed Java 17" || echo "Error removing Java 17"
 fi
 
-pkg install openjdk-21 -y && echo "Installed Java 21" || echo "Error installing Java 21"
+if [ "$java_ver" != 21 ]; then
+    pkg install openjdk-21 -y && echo "Installed Java 21" || echo "Error installing Java 21"
+fi
+
 pkg autoclean && pkg clean -y && echo "Cleaned packages" || echo "Error cleaning packages"
 
 java_ver=$(java -version 2>&1 | awk -F[\"\.] -v OFS=. 'NR==1{print $2}')
@@ -126,4 +129,4 @@ chmod +x "$mcserver_path"
 echo "You can now start the server by typing \"mcserver\""
 
 echo "Starting the Minecraft server with $ram GB of RAM..."
-java -Xms${ram}G -Xmx${ram}G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar "$jar_name" nogui
+mcserver
