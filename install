@@ -100,6 +100,7 @@ echo "Download complete."
 if [ "$server_type" = "3" ]; then
     echo "Installing Fabric server..."
     java -jar "$jar_name" server -mcversion "$version" -downloadMinecraft
+    jar_name="server.jar"
     if [ $? -ne 0 ]; then
         echo "Error setting up Fabric server."
         exit 1
