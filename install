@@ -109,8 +109,11 @@ fi
 echo "Creating mcserver command..."
 mcserver_path="$PREFIX/bin/mcserver"
 if [ -f "$mcserver_path" ]; then
-    echo "Warning: 'mcserver' command already exists. Overwriting..."
+    echo "Warning: \"mcserver\" command already exists. Overwriting..."
 fi
+
+echo "Acepting Minecraft eula..."
+echo "eula=true" > "eula.txt"
 
 {
 echo "#!/bin/bash"
