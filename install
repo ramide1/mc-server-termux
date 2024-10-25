@@ -2,11 +2,11 @@
 
 rm ~/x
 
-pkg upgrade -y &>/dev/null && echo "Updated packages" || echo "Error updating packages"
+pkg upgrade -y && echo "Updated packages" || echo "Error updating packages"
 
 if ! command -v curl &>/dev/null; then
     echo "curl is not installed. Installing curl..."
-    pkg install curl -y &>/dev/null && echo "Installed curl" || echo "Error installing curl"
+    pkg install curl -y && echo "Installed curl" || echo "Error installing curl"
 fi
 
 if [ ! -d "$HOME/storage/shared" ]; then
@@ -27,11 +27,11 @@ cd "$server_dir" || { echo "Failed to access server folder"; exit 1; }
 java_ver=$(java -version 2>&1 | awk -F[\"\.] -v OFS=. 'NR==1{print $2}')
 
 if [ "$java_ver" = 17 ]; then
-    pkg remove openjdk-17 -y &>/dev/null && echo "Removed Java 17" || echo "Error removing Java 17"
+    pkg remove openjdk-17 -y && echo "Removed Java 17" || echo "Error removing Java 17"
 fi
 
-pkg install openjdk-21 -y &>/dev/null && echo "Installed Java 21" || echo "Error installing Java 21"
-pkg autoclean && pkg clean -y &>/dev/null && echo "Cleaned packages" || echo "Error cleaning packages"
+pkg install openjdk-21 -y && echo "Installed Java 21" || echo "Error installing Java 21"
+pkg autoclean && pkg clean -y && echo "Cleaned packages" || echo "Error cleaning packages"
 
 java_ver=$(java -version 2>&1 | awk -F[\"\.] -v OFS=. 'NR==1{print $2}')
 
