@@ -77,38 +77,24 @@ case "$server_type" in
             exit 1
         fi
         download_url="https://api.papermc.io/v2/projects/paper/versions/$version/builds/$latest_build/downloads/paper-$version-$latest_build.jar"
-        jar_name="server.jar"
         ;;
     2)
         echo "Fetching Purpur build information..."
         download_url="https://api.purpurmc.org/v2/purpur/$version/latest/download"
-        jar_name="server.jar"
         ;;
     3)
         echo "Fetching Fabric installer..."
-        download_url="https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.1/fabric-installer-1.0.1.jar"
-        jar_name="fabric-installer.jar"
+        download_url="https://meta.fabricmc.net/v2/versions/loader/$version/0.16.10/1.0.1/server/jar"
         ;;
 esac
 
 echo "Downloading server from $download_url..."
-curl -o "$jar_name" "$download_url"
+curl -o "server.jar" "$download_url"
 if [ $? -ne 0 ]; then
     echo "Error downloading the server."
     exit 1
 fi
-
 echo "Download complete."
-
-if [ "$server_type" = "3" ]; then
-    echo "Installing Fabric server..."
-    java -jar "$jar_name" server -mcversion "$version" -downloadMinecraft
-    jar_name="fabric-server-launch.jar"
-    if [ $? -ne 0 ]; then
-        echo "Error setting up Fabric server."
-        exit 1
-    fi
-fi
 
 echo "Creating mcserver command..."
 mcserver_path="$PREFIX/bin/mcserver"
@@ -122,7 +108,7 @@ echo "eula=true" > "eula.txt"
 {
 echo "#!/bin/bash"
 echo "cd \"$server_dir\""
-echo "java -Xms${ram}G -Xmx${ram}G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar \"$jar_name\" nogui"
+echo "java -Xms${ram}G -Xmx${ram}G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar server.jar nogui"
 } > "$mcserver_path"
 
 chmod +x "$mcserver_path"
