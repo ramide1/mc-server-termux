@@ -47,8 +47,11 @@ fi
 echo "Select server type:"
 echo "1) Paper - Plugin Support - Based on Spigot, designed to greatly improve performance and offer more advanced features and API."
 echo "2) Purpur - Plugin Support - Drop-in replacement for Paper servers designed for configurability, new fun and exciting gameplay features."
-echo "3) DivineMC - Plugin Support - High-performance Purpur fork focused on maximizing server performance while maintaining plugin compatibility."
+echo "3) DivineMC - Plugin Support - Multi-functional fork of Purpur, which focuses on the flexibility of your server and its optimization."
 echo "4) Fabric - Mod Support - Lightweight and modular Minecraft server software."
+echo "5) Folia - Some Plugin Support - Paper fork that adds regionized multithreading to the server."
+echo "6) Vanilla - The official Minecraft server software."
+echo "7) Spigot - Plugin Support - High performance fork of the Bukkit Minecraft Server."
 read -rp "Choose an option [1-4]: " server_type
 
 if [ "$server_type" != "1" ] && [ "$server_type" != "2" ] && [ "$server_type" != "3" ] && [ "$server_type" != "4" ]; then
@@ -56,10 +59,10 @@ if [ "$server_type" != "1" ] && [ "$server_type" != "2" ] && [ "$server_type" !=
     exit 1
 fi
 
-read -p "Enter Minecraft version (e.g., 1.21.5): " version
+read -p "Enter Minecraft version (e.g., 1.21.8): " version
 
 if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Invalid version format. Expected format: x.x.x (e.g., 1.21.5)"
+    echo "Invalid version format. Expected format: x.x.x (e.g., 1.21.8)"
     exit 1
 fi
 
@@ -84,7 +87,19 @@ case "$server_type" in
         ;;
     4)
         echo "Fetching Fabric installer..."
-        download_url="https://meta.fabricmc.net/v2/versions/loader/$version/0.16.10/1.0.1/server/jar"
+        download_url="https://meta.fabricmc.net/v2/versions/loader/$version/0.17.2/1.1.0/server/jar"
+        ;;
+    5)
+        echo "Fetching Folia build information..."
+        download_url=$(curl -s "https://mcjars.app/api/v1/builds/FOLIA/$version/latest?tracking=none" | sed -n 's/.*"jarUrl": *"\([^"]*\)".*/\1/p')
+        ;;
+    6)
+        echo "Fetching Vanilla build information..."
+        download_url=$(curl -s "https://mcjars.app/api/v1/builds/VANILLA/$version/latest?tracking=none" | sed -n 's/.*"jarUrl": *"\([^"]*\)".*/\1/p')
+        ;;
+    7)
+        echo "Fetching Spigot build information..."
+        download_url=$(curl -s "https://mcjars.app/api/v1/builds/SPIGOT/$version/latest?tracking=none" | sed -n 's/.*"jarUrl": *"\([^"]*\)".*/\1/p')
         ;;
 esac
 
