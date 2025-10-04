@@ -52,17 +52,18 @@ echo "4) Fabric - Mod Support - Lightweight and modular Minecraft server softwar
 echo "5) Folia - Some Plugin Support - Paper fork that adds regionized multithreading to the server."
 echo "6) Vanilla - The official Minecraft server software."
 echo "7) Spigot - Plugin Support - High performance fork of the Bukkit Minecraft Server."
-read -rp "Choose an option [1-7]: " server_type
+echo "8) Forge - Mod Support - The original Minecraft modding platform."
+read -rp "Choose an option [1-8]: " server_type
 
-if [ "$server_type" != "1" ] && [ "$server_type" != "2" ] && [ "$server_type" != "3" ] && [ "$server_type" != "4" ] && [ "$server_type" != "5" ] && [ "$server_type" != "6" ] && [ "$server_type" != "7" ]; then
+if [ "$server_type" != "1" ] && [ "$server_type" != "2" ] && [ "$server_type" != "3" ] && [ "$server_type" != "4" ] && [ "$server_type" != "5" ] && [ "$server_type" != "6" ] && [ "$server_type" != "7" ] && [ "$server_type" != "8" ]; then
     echo "Invalid option. Exiting."
     exit 1
 fi
 
-read -p "Enter Minecraft version (e.g., 1.21.8): " version
+read -p "Enter Minecraft version (e.g., 1.21.9): " version
 
 if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Invalid version format. Expected format: x.x.x (e.g., 1.21.8)"
+    echo "Invalid version format. Expected format: x.x.x (e.g., 1.21.9)"
     exit 1
 fi
 
@@ -101,6 +102,17 @@ case "$server_type" in
         echo "Fetching Spigot build information..."
         download_url=$(curl -s "https://mcjars.app/api/v1/builds/SPIGOT/$version/latest?tracking=none" | sed -n 's/.*"jarUrl": *"\([^"]*\)".*/\1/p')
         ;;
+    8)
+        read -p "Enter Forge version (e.g., 59.0.1): " forge_version
+
+        if ! [[ "$forge_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format. Expected format: x.x.x (e.g., 59.0.1)"
+            exit 1
+        fi
+
+        echo "Fetching Forge installer..."
+        download_url="https://maven.minecraftforge.net/net/minecraftforge/forge/$version-$forge_version/forge-$version-$forge_version-installer.jar"
+        ;;
 esac
 
 echo "Downloading server from $download_url..."
@@ -110,6 +122,11 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 echo "Download complete."
+
+if [ "$server_type" = "8" ]; then
+    echo "Installing Forge Server..."
+    java -jar server.jar --installServer
+fi
 
 echo "Creating mcserver command..."
 mcserver_path="$PREFIX/bin/mcserver"
