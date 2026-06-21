@@ -74,13 +74,11 @@ fi
 case "$server_type" in
     1)
         echo "Fetching PaperMC build information..."
-        paper_api="https://api.papermc.io/v2/projects/paper/versions/$version"
-        latest_build=$(curl -s "$paper_api" | grep -o '"builds":[^]]*' | sed 's/.*,//')
-        if [ -z "$latest_build" ]; then
+        download_url=$(curl -s "https://fill.papermc.io/v3/projects/paper/versions/$version/builds/latest" | sed -n 's/.*"url": *"\([^"]*\)".*/\1/p')
+        if [ -z "$download_url" ]; then
             echo "Error fetching build information. Exiting."
             exit 1
         fi
-        download_url="https://api.papermc.io/v2/projects/paper/versions/$version/builds/$latest_build/downloads/paper-$version-$latest_build.jar"
         ;;
     2)
         echo "Fetching Purpur build information..."
